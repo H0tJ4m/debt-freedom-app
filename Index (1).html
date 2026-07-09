@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Debt Freedom — Plan · Grow · Track</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root[data-theme=dark]{
+  --bg:#0a0f1e; --bg-grad:radial-gradient(1200px 600px at 80% -10%,#12305522 0%,transparent 60%),radial-gradient(900px 500px at -10% 110%,#0d3b2e22 0%,transparent 60%),linear-gradient(180deg,#0a0f1e,#0d1426);
+  --card:#131c31f2; --card2:#182440; --line:#233250; --ink:#e8eef8; --mut:#93a7c4; --dim:#5d7191;
+  --acc:#34d399; --acc-deep:#10b981; --acc-soft:#34d3991f; --on-acc:#04251a;
+  --amber:#fbbf24; --red:#fb7185; --blue:#60a5fa; --violet:#a78bfa; --cyan:#22d3ee;
+  --chip:#1a2742; --seg:#0e1730; --ring-track:#1d2a47; --shadow:0 10px 30px #0006;
+  --input:#0e1730; --pos:#34d399; --neg:#fb7185;
+}
+:root[data-theme=light]{
+  --bg:#f2f5fa; --bg-grad:radial-gradient(1000px 500px at 85% -10%,#c7ddff55 0%,transparent 60%),radial-gradient(800px 450px at -5% 110%,#bdf0dd55 0%,transparent 60%),linear-gradient(180deg,#f2f5fa,#eef2f9);
+  --card:#ffffffee; --card2:#f4f7fd; --line:#dfe6f2; --ink:#111a2c; --mut:#5a6b85; --dim:#8b9ab1;
+  --acc:#0ca678; --acc-deep:#099268; --acc-soft:#0ca67818; --on-acc:#ffffff;
+  --amber:#d97706; --red:#e5484d; --blue:#2f6fed; --violet:#7c5cf0; --cyan:#0891b2;
+  --chip:#eaf0fa; --seg:#e8edf7; --ring-track:#e3e9f4; --shadow:0 10px 24px #93a4c22e;
+  --input:#f6f8fd; --pos:#0ca678; --neg:#e5484d;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);background-image:var(--bg-grad);background-attachment:fixed;color:var(--ink);
+  font-family:'Segoe UI',system-ui,-apple-system,'SF Pro Text',Roboto,sans-serif;font-size:15px;line-height:1.5;min-height:100vh}
+button{font-family:inherit}
+/* ---------- app bar ---------- */
+.appbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:12px 18px;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16.5px;letter-spacing:-.2px}
+.logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--cyan));
+  display:flex;align-items:center;justify-content:center;color:var(--on-acc);font-size:15px;font-weight:900}
+.freedom-pill{margin-left:auto;display:flex;align-items:center;gap:7px;background:var(--acc-soft);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);
+  color:var(--acc);font-weight:700;font-size:12.5px;padding:5px 12px;border-radius:99px;white-space:nowrap}
+.freedom-pill .dotp{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.theme-btn{border:1px solid var(--line);background:var(--card2);color:var(--ink);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px;transition:transform .15s}
+.theme-btn:hover{transform:rotate(20deg) scale(1.08)}
+/* ---------- tabs ---------- */
+.tabs{position:sticky;top:59px;z-index:39;display:flex;gap:4px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex:0 0 auto;display:flex;align-items:center;gap:7px;border:none;background:transparent;color:var(--mut);
+  font-size:13.5px;font-weight:650;padding:8px 14px;border-radius:11px;cursor:pointer;transition:all .18s}
+.tab-btn:hover{color:var(--ink);background:var(--chip)}
+.tab-btn.active{background:var(--acc);color:var(--on-acc);box-shadow:0 4px 14px color-mix(in srgb,var(--acc) 40%,transparent)}
+main{max-width:1150px;margin:0 auto;padding:20px 16px 90px}
+section.tabpane{display:none;animation:fadein .25s ease}
+section.tabpane.active{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ---------- cards & grids ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+.card.tight{padding:14px 16px}
+.g{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.g23{grid-template-columns:2fr 3fr}.g32{grid-template-columns:3fr 2fr}
+@media(max-width:920px){.g2,.g3,.g23,.g32{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}
+h2{font-size:15.5px;font-weight:750;margin-bottom:4px;letter-spacing:-.2px}
+.h-sub{font-size:12.5px;color:var(--mut);margin-bottom:14px}
+.sec-note{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.5}
+/* ---------- hero ring ---------- */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+@media(max-width:760px){.hero{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.ring-wrap{position:relative;width:190px;height:190px}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-track{stroke:var(--ring-track)}
+.ring-fill{stroke:url(#ringGrad);stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-center .pct{font-size:34px;font-weight:800;letter-spacing:-1px}
+.ring-center .cap{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+@media(max-width:560px){.hero-stats{grid-template-columns:1fr}}
+.hstat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 15px}
+.hstat .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px}
+.hstat .v{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-top:2px}
+.hstat .s{font-size:11.5px;color:var(--dim);margin-top:1px}
+.good{color:var(--pos)}.bad{color:var(--neg)}.warn{color:var(--amber)}.info{color:var(--blue)}
+/* ---------- move cards ---------- */
+.moves{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:820px){.moves{grid-template-columns:1fr}}
+.move{position:relative;background:var(--card2);border:1px solid var(--line);border-radius:15px;padding:14px 16px;transition:transform .15s,border-color .15s;cursor:pointer}
+.move:hover{transform:translateY(-2px);border-color:var(--acc)}
+.move.done{border-color:var(--acc);background:var(--acc-soft)}
+.move .ic{font-size:20px}
+.move .t{font-weight:700;font-size:13.5px;margin-top:6px}
+.move .amt{font-size:20px;font-weight:800;margin:2px 0;letter-spacing:-.4px}
+.move .d{font-size:11.5px;color:var(--mut)}
+.move .chk{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;border:2px solid var(--dim);
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--on-acc);transition:all .15s}
+.move.done .chk{background:var(--acc);border-color:var(--acc)}
+/* ---------- chips ---------- */
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--chip);color:var(--ink);font-size:12.5px;font-weight:650;
+  padding:7px 13px;border-radius:99px;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--acc);transform:translateY(-1px)}
+.chip.on{background:var(--acc);color:var(--on-acc);border-color:var(--acc)}
+.whatif-out{margin-top:12px;font-size:13.5px;background:var(--acc-soft);border:1px dashed color-mix(in srgb,var(--acc) 45%,transparent);
+  border-radius:12px;padding:11px 14px;display:none}
+.whatif-out.show{display:block;animation:fadein .25s}
+/* ---------- stepper ---------- */
+.stepper{display:inline-flex;align-items:center;background:var(--seg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stepper button{width:36px;height:38px;border:none;background:transparent;color:var(--acc);font-size:19px;font-weight:800;cursor:pointer;transition:background .12s}
+.stepper button:hover{background:var(--acc-soft)}
+.stepper button:active{background:var(--acc);color:var(--on-acc)}
+.stepper input{width:96px;border:none;background:transparent;color:var(--ink);text-align:center;font-size:15px;font-weight:750;outline:none;font-family:inherit}
+.stepper.big input{width:130px;font-size:19px}
+.stepper.big button{width:44px;height:46px}
+.stepper.sm input{width:64px;font-size:13px}
+.stepper.sm button{width:28px;height:30px;font-size:15px}
+/* ---------- segmented ---------- */
+.seg{display:inline-flex;background:var(--seg);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:none;background:transparent;color:var(--mut);font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:9px;cursor:pointer;transition:all .15s}
+.seg button.on{background:var(--acc);color:var(--on-acc);box-shadow:0 2px 8px color-mix(in srgb,var(--acc) 35%,transparent)}
+.lblf{display:block;font-size:11.5px;color:var(--mut);margin:10px 0 5px;font-weight:650;letter-spacing:.2px}
+/* ---------- expense cards ---------- */
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:11px}
+.exp-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 13px;position:relative;transition:border-color .15s}
+.exp-card:hover{border-color:var(--acc)}
+.exp-card .ico{font-size:21px}
+.exp-card .nm{font-size:12.5px;font-weight:650;color:var(--mut);margin:4px 0 7px;border:none;background:transparent;width:88%;font-family:inherit;color:var(--mut)}
+.exp-card .nm:focus{outline:none;color:var(--ink);border-bottom:1px dashed var(--acc)}
+.exp-card .x{position:absolute;top:9px;right:11px;border:none;background:none;color:var(--dim);cursor:pointer;font-size:14px;opacity:.6}
+.exp-card .x:hover{color:var(--red);opacity:1}
+/* ---------- loan cards ---------- */
+.loan-card{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:13px}
+.loan-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.loan-head input.lname{border:none;background:transparent;color:var(--ink);font-weight:750;font-size:15px;font-family:inherit;width:210px}
+.loan-head input.lname:focus{outline:none;border-bottom:1px dashed var(--acc)}
+.badge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.4px}
+.badge.hot{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 45%,transparent)}
+.badge.mid{background:color-mix(in srgb,var(--amber) 14%,transparent);color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
+.badge.acc{background:var(--acc-soft);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent)}
+.pbar{height:9px;background:var(--ring-track);border-radius:99px;overflow:hidden;margin:11px 0 5px}
+.pbar>div{height:100%;background:linear-gradient(90deg,var(--acc-deep),var(--acc));border-radius:99px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.pbar-cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--dim)}
+.lstats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+@media(max-width:700px){.lstats{grid-template-columns:1fr 1fr}}
+.lstat{background:var(--input);border:1px solid var(--line);border-radius:11px;padding:8px 11px}
+.lstat .l{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+.lstat .v{font-size:15.5px;font-weight:750;margin-top:1px}
+details.adv{margin-top:12px}
+details.adv summary{cursor:pointer;font-size:12.5px;color:var(--blue);font-weight:650;list-style:none}
+details.adv summary::before{content:"⚙ "}
+.adv-grid{display:grid;grid-template-columns:repeat(4,auto);gap:14px;margin-top:11px;align-items:end}
+@media(max-width:820px){.adv-grid{grid-template-columns:1fr 1fr}}
+/* ---------- alloc ---------- */
+.alloc-bar{display:flex;height:30px;border-radius:10px;overflow:hidden;margin:12px 0 8px}
+.alloc-bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;transition:width .5s ease;text-shadow:0 1px 2px #0005;min-width:0;white-space:nowrap;overflow:hidden}
+.bucket{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:10px 14px;margin-bottom:8px}
+.bucket .sw{width:13px;height:13px;border-radius:4px}
+.bucket .bn{font-weight:700;font-size:13.5px}
+.bucket .bd{font-size:11.5px;color:var(--mut)}
+/* ---------- market tiles ---------- */
+.tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:11px 13px;cursor:pointer;transition:border-color .15s}
+.tile:hover{border-color:var(--acc)}
+.tile .l{font-size:11px;color:var(--mut)}
+.tile .v{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.tile .v input{width:80px;border:none;border-bottom:1.5px solid var(--acc);background:transparent;color:var(--ink);font-size:18px;font-weight:800;outline:none;font-family:inherit}
+.tip{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:12px 15px;margin-bottom:9px;font-size:13.5px}
+.tip b{color:var(--acc)} .tip .why{color:var(--mut);font-size:12.5px;display:block;margin-top:3px}
+.tip.warn2{border-left:3.5px solid var(--amber)} .tip.act{border-left:3.5px solid var(--acc)} .tip.inf{border-left:3.5px solid var(--blue)}
+.nav-card{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.nav-card .n{font-size:12.5px;font-weight:650}
+.nav-card .ret{font-weight:800;font-size:14.5px;text-align:right}
+.nav-card .navv{font-size:12px;color:var(--mut);text-align:right}
+/* ---------- track ---------- */
+.mile{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line)}
+.mile:last-child{border-bottom:none}
+.mile .dot{width:12px;height:12px;border-radius:50%;background:var(--acc);margin-top:5px;flex-shrink:0;box-shadow:0 0 10px color-mix(in srgb,var(--acc) 55%,transparent)}
+.mile .dot.f{background:var(--dim);box-shadow:none}
+.mile .when{font-size:12px;color:var(--amber);font-weight:750;min-width:88px}
+.mile .what{font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--mut);text-align:left;font-weight:650;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:7px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+td.r,th.r{text-align:right}
+.btn{background:var(--acc);color:var(--on-acc);border:none;border-radius:11px;padding:10px 18px;font-weight:750;font-size:13.5px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px color-mix(in srgb,var(--acc) 40%,transparent)}
+.btn.ghost{background:transparent;color:var(--acc);border:1.5px dashed var(--acc)}
+.btn.gray{background:var(--chip);color:var(--mut);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:12px;border-radius:9px}
+.streak{display:inline-flex;align-items:center;gap:7px;background:color-mix(in srgb,var(--amber) 13%,transparent);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);color:var(--amber);font-weight:750;font-size:12.5px;padding:6px 13px;border-radius:99px}
+input.fld,select.fld{background:var(--input);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px 12px;font-size:13.5px;outline:none;font-family:inherit;width:100%}
+input.fld:focus{border-color:var(--acc)}
+.chartbox{position:relative;height:280px}
+.chartbox.sm{height:240px}
+/* ---------- wizard ---------- */
+#wizard{position:fixed;inset:0;z-index:100;background:var(--bg);background-image:var(--bg-grad);display:none;overflow-y:auto}
+#wizard.show{display:block}
+.wiz-inner{max-width:660px;margin:0 auto;padding:38px 20px 60px;animation:fadein .3s}
+.wiz-dots{display:flex;gap:8px;justify-content:center;margin-bottom:26px}
+.wiz-dots div{width:34px;height:5px;border-radius:99px;background:var(--ring-track);transition:background .3s}
+.wiz-dots div.on{background:var(--acc)}
+.wiz-title{font-size:26px;font-weight:800;letter-spacing:-.6px;text-align:center}
+.wiz-sub{color:var(--mut);text-align:center;margin:8px 0 26px;font-size:14px}
+.wiz-nav{display:flex;gap:10px;justify-content:space-between;margin-top:28px}
+.wiz-reveal{text-align:center;padding:20px 0}
+.wiz-reveal .big{font-size:40px;font-weight:850;letter-spacing:-1.5px;color:var(--acc)}
+.wiz-reveal .mid{font-size:16px;color:var(--mut);margin-top:6px}
+.footer-disc{font-size:11px;color:var(--dim);max-width:1150px;margin:0 auto;padding:14px 16px 30px;line-height:1.55;border-top:1px solid var(--line)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:200}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(80px);background:var(--card);color:var(--ink);
+  border:1px solid var(--acc);border-radius:13px;padding:11px 20px;font-size:13.5px;font-weight:650;z-index:150;transition:transform .3s;box-shadow:var(--shadow)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div id="wizard"></div>
+
+<div id="app" style="display:none">
+  <div class="appbar">
+    <div class="logo"><div class="mark">₹</div>Debt Freedom</div>
+    <div class="freedom-pill"><span class="dotp"></span><span id="pillTxt">calculating…</span></div>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">◐</button>
+  </div>
+  <nav class="tabs" id="tabbar"></nav>
+  <main>
+    <section class="tabpane" id="tab-home"></section>
+    <section class="tabpane" id="tab-money"></section>
+    <section class="tabpane" id="tab-loans"></section>
+    <section class="tabpane" id="tab-invest"></section>
+    <section class="tabpane" id="tab-market"></section>
+    <section class="tabpane" id="tab-track"></section>
+  </main>
+  <div class="footer-disc">All projections assume on-time EMIs and monthly deployment of the plan surplus. Investment returns are long-term assumptions, not guarantees. Educational planning tool — not SEBI-registered investment advice. Verify prepayment terms in your loan sanction letters. Embedded reference rates (July 2026): RBI repo 5.25% · PPF 7.1% · NSC 7.7% · major-bank 1-yr FD ~6.25% · small-finance-bank FDs ≤8.1% (DICGC-insured to ₹5L). Live NAVs courtesy mfapi.in when online.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/*ENGINE-START*/
+function emiCalc(P,ratePct,n){const i=ratePct/1200;return P*i*Math.pow(1+i,n)/(Math.pow(1+i,n)-1);}
+function outstandingAfter(P,ratePct,n,k,emi){const i=ratePct/1200;emi=emi||emiCalc(P,ratePct,n);
+  return Math.max(0,P*Math.pow(1+i,k)-emi*(Math.pow(1+i,k)-1)/i);}
+function simulate(cfg){
+  const L=cfg.loans.map(l=>({...l}));
+  let ef=cfg.efNow, pool=cfg.bonus0||0, invest=0, income=cfg.income;
+  let totalInt=0, totalPen=0, m=0, debtFree=null, starterDone=null, efDone=null;
+  const deaths={}, series={debt:[],ef:[],inv:[],net:[],planned:[]};
+  let first=null;
+  const alive=()=>L.some(l=>l.bal>0.005);
+  const CAP=360;
+  while(m<CAP&&(alive()||debtFree===null||m<debtFree+cfg.horizonPostFree)){
+    if(m>0&&m%12===0)income*=1+cfg.salGrowth;
+    ef*=1+cfg.efRate/12; pool*=1+cfg.efRate/12; invest*=1+cfg.blended/12;
+    let emiOut=0;
+    for(const l of L){
+      if(l.bal<=0.005)continue;
+      const i=l.bal*l.rate/1200; totalInt+=i;
+      const pay=Math.min(l.emi,l.bal+i);
+      l.bal=l.bal+i-pay; emiOut+=pay;
+      if(l.bal<=0.005&&!(l.name in deaths))deaths[l.name]=m;
+    }
+    let surplus=income-cfg.expenses-emiOut;
+    let sipNow=0, efAdd=0, poolAdd=0, prepaidNow=0, prepayTarget=null, parked=false, investAdd=0;
+    if(alive()&&cfg.sip>0&&surplus>cfg.sip){sipNow=cfg.sip;surplus-=sipNow;invest+=sipNow;}
+    if(surplus>0){
+      if(ef<cfg.starterTarget){const a=Math.min(surplus,cfg.starterTarget-ef);ef+=a;surplus-=a;efAdd+=a;}
+      if(ef>=cfg.starterTarget&&starterDone===null)starterDone=m;
+      if(surplus>0&&ef<cfg.efTarget){const a=Math.min(surplus*0.5,cfg.efTarget-ef);ef+=a;surplus-=a;efAdd+=a;}
+      if(ef>=cfg.efTarget&&efDone===null)efDone=m;
+      if(alive()){pool+=surplus;poolAdd=surplus;}
+      else{invest+=surplus;investAdd=surplus;}
+      surplus=0;
+    }
+    const open=L.filter(l=>l.bal>0.005&&l.lockRemaining<=m).sort((a,b)=>b.rate-a.rate);
+    const lockedAlive=L.filter(l=>l.bal>0.005&&l.lockRemaining>m).sort((a,b)=>b.rate-a.rate);
+    if(open.length&&pool>=cfg.minChunk){
+      for(const l of open){
+        if(pool<cfg.minChunk)break;
+        const eff=pool/(1+l.pen), pre=Math.min(eff,l.bal);
+        l.bal-=pre; const pen=pre*l.pen; totalPen+=pen; pool-=pre+pen; prepaidNow+=pre;
+        if(!prepayTarget)prepayTarget=l.name;
+        if(l.bal<=0.005&&!(l.name in deaths))deaths[l.name]=m;
+      }
+    } else if(L.some(l=>l.bal>0.005)&&!open.length&&lockedAlive.length){parked=true;prepayTarget=lockedAlive[0].name;}
+    if(!alive()&&debtFree===null){debtFree=m;invest+=pool;pool=0;}
+    if(m===0)first={emiOut,sipNow,efAdd,poolAdd,prepaidNow,prepayTarget,parked,investAdd,
+      surplusTotal:income-cfg.expenses-emiOut,deficit:income-cfg.expenses-emiOut<0};
+    const totDebt=L.reduce((s,l)=>s+Math.max(0,l.bal),0);
+    series.debt.push(totDebt); series.ef.push(ef+pool); series.inv.push(invest);
+    series.net.push(ef+pool+invest-totDebt); series.planned.push(efAdd+poolAdd+sipNow+investAdd);
+    m++;
+  }
+  const B=cfg.loans.map(l=>({...l})); let bInt=0; const bSeries=[]; let bm=0;
+  while(B.some(l=>l.bal>0.005)&&bm<CAP){
+    for(const l of B){ if(l.bal<=0.005)continue;
+      const i=l.bal*l.rate/1200; bInt+=i; const pay=Math.min(l.emi,l.bal+i); l.bal=l.bal+i-pay;}
+    bSeries.push(B.reduce((s,l)=>s+Math.max(0,l.bal),0)); bm++;
+  }
+  return {series,bSeries,first,metrics:{debtFree,starterDone,efDone,deaths,totalInt,totalPen,bInt,
+    baselineMonths:bm,corpusAtFree:debtFree!==null?series.inv[debtFree]:0,
+    netEnd:series.net[series.net.length-1]||0,
+    interestSaved:bInt-totalInt-totalPen}};
+}
+/*ENGINE-END*/
+
+// ================= state =================
+const ICONS={rent:"🏠",hous:"🏠",grocer:"🛒",food:"🍛",transport:"🛵",fuel:"⛽",util:"💡",phone:"📱",internet:"🌐",subscri:"📺",family:"👨‍👩‍👧",personal:"🎯",misc:"🎯",health:"🏥",edu:"📚",ent:"🎬",shop:"🛍️"};
+function guessIcon(name){const n=(name||"").toLowerCase();for(const k in ICONS)if(n.includes(k))return ICONS[k];return "💳";}
+const DEFAULTS={
+  income:65000,
+  expenses:[["Rent / housing",12000,"🏠"],["Groceries & food",6000,"🛒"],["Transport / fuel",2500,"🛵"],["Utilities & internet",2000,"💡"],["Subscriptions",500,"📺"],["Family support",4000,"👨‍👩‍👧"],["Personal & misc",3000,"🎯"]],
+  loans:[
+    {name:"HDFC personal loan",principal:800000,rate:11.85,tenure:72,start:"2026-01",lockMonths:12,penPct:4.72,kPaid:null,emiOv:null},
+    {name:"Kotak personal loan",principal:145000,rate:14.25,tenure:36,start:"2026-05",lockMonths:12,penPct:4.72,kPaid:null,emiOv:null}
+  ],
+  efNow:0,efMonths:3,minChunk:5000,habitSip:true,habitSipAmt:1000,salGrowth:5,
+  preset:"balanced",alEq:40,alFx:15,alDb:25,alGl:10,alLq:10,rEq:12,rDb:7,rGl:8,rEf:6,
+  mRepo:5.25,mPpf:7.1,mFd:6.25,mSfb:8.10,mNsc:7.7,mLiq:5.8,mInf:4.5,mEqLt:12,
+  logs:[],checks:{},navCodes:[120716,122639],navCache:null,
+  theme:(typeof matchMedia!=="undefined"&&matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark",
+  onboarded:false
+};
+let S=loadState();
+function loadState(){
+  try{
+    const v2=localStorage.getItem("dfp-v2");
+    if(v2){const s=JSON.parse(v2);return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)),s);}
+    const v1=localStorage.getItem("dfp-v1");
+    if(v1){const o=JSON.parse(v1),s=JSON.parse(JSON.stringify(DEFAULTS));
+      for(const k of ["income","efNow","efMonths","minChunk","habitSip","habitSipAmt","salGrowth","alEq","alFx","alDb","alGl","alLq","rEq","rDb","rGl","rEf","mRepo","mPpf","mFd","mSfb","mNsc","mLiq","mInf","mEqLt","logs"])if(k in o)s[k]=o[k];
+      if(o.loans)s.loans=o.loans.map(l=>({name:l.name,principal:l.principal,rate:l.rate,tenure:l.tenure,start:l.start,lockMonths:l.lockMonths,penPct:l.penPct,kPaid:l.kPaid??null,emiOv:l.emiOv??null}));
+      if(o.expenses)s.expenses=o.expenses.map(e=>[e[0],e[1],guessIcon(e[0])]);
+      s.onboarded=true; s.preset="custom"; return s;}
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULTS));
+}
+let saveT;function store(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem("dfp-v2",JSON.stringify(S));}catch(e){}},250);}
+
+// ================= helpers =================
+const NOW=new Date(), NY=NOW.getFullYear(), NM=NOW.getMonth();
+const $=id=>document.getElementById(id);
+const fmt=x=>"₹"+new Intl.NumberFormat("en-IN",{maximumFractionDigits:0}).format(Math.round(x||0));
+const lakh=x=>Math.abs(x)>=100000?"₹"+(x/100000).toFixed(Math.abs(x)>=1000000?1:2)+"L":fmt(x);
+const mLabel=i=>new Date(NY,NM+i,1).toLocaleString("en-IN",{month:"short",year:"numeric"});
+const monthsSince=ym=>{const[y,mo]=ym.split("-").map(Number);return Math.max(0,(NY-y)*12+(NM-(mo-1)));};
+const curYM=()=>`${NY}-${String(NM+1).padStart(2,"0")}`;
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400);}
+
+// animated counter
+function countUp(el,to,fmtFn){
+  if(!el)return; fmtFn=fmtFn||fmt;
+  const from=el._v||0; el._v=to;
+  if(Math.abs(to-from)<1){el.textContent=fmtFn(to);return;}
+  const t0=performance.now(),dur=650;
+  function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=fmtFn(from+(to-from)*e);
+    if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+// stepper component
+function stepper(id,val,step,min,max,cls,suffix){
+  return `<span class="stepper ${cls||""}" id="st_${id}">
+    <button data-d="-1" tabindex="-1">−</button>
+    <input value="${val}" inputmode="numeric" data-suffix="${suffix||""}">
+    <button data-d="1" tabindex="-1">+</button></span>`;
+}
+function wireStepper(id,get,set,step,min,max,fmtIn){
+  const w=$("st_"+id); if(!w)return;
+  const inp=w.querySelector("input");
+  const show=()=>{inp.value=(fmtIn?fmtIn(get()):get())+(inp.dataset.suffix||"");};
+  show();
+  const apply=v=>{v=Math.max(min,Math.min(max,v));set(v);show();recalc();};
+  inp.addEventListener("change",()=>{const v=parseFloat(String(inp.value).replace(/[^\d.\-]/g,""));apply(isNaN(v)?get():v);});
+  w.querySelectorAll("button").forEach(b=>{
+    const d=+b.dataset.d;
+    let iv,ho;
+    const once=()=>apply(get()+d*step);
+    b.addEventListener("click",once);
+    const start=e=>{e.preventDefault();ho=setTimeout(()=>{iv=setInterval(once,90);},450);};
+    const stop=()=>{clearTimeout(ho);clearInterval(iv);};
+    b.addEventListener("mousedown",start);b.addEventListener("touchstart",start,{passive:false});
+    ["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>b.addEventListener(ev,stop));
+  });
+}
+
+// segmented control
+function segmented(id,opts,val){
+  return `<span class="seg" id="sg_${id}">${opts.map(o=>`<button data-v="${o.v}" class="${String(o.v)===String(val)?"on":""}">${o.t}</button>`).join("")}</span>`;
+}
+function wireSeg(id,onpick){
+  const w=$("sg_"+id); if(!w)return;
+  w.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    w.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");onpick(b.dataset.v);}));
+}
+
+// confetti
+function confetti(){
+  const c=$("confetti"),x=c&&c.getContext?c.getContext("2d"):null;
+  if(!x)return;
+  c.width=innerWidth;c.height=innerHeight;
+  const P=[],cols=["#34d399","#fbbf24","#60a5fa","#a78bfa","#fb7185","#22d3ee"];
+  for(let i=0;i<90;i++)P.push({x:innerWidth/2+(Math.random()-.5)*120,y:innerHeight*0.35,vx:(Math.random()-.5)*11,vy:-Math.random()*11-3,s:4+Math.random()*5,c:cols[i%6],r:Math.random()*6.3,vr:(Math.random()-.5)*.3});
+  const t0=performance.now();
+  (function anim(t){
+    x.clearRect(0,0,c.width,c.height);
+    for(const p of P){p.x+=p.vx;p.y+=p.vy;p.vy+=.32;p.r+=p.vr;
+      x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore();}
+    if(t-t0<1600)requestAnimationFrame(anim);else x.clearRect(0,0,c.width,c.height);
+  })(t0);
+}
+
+// loan computed
+function loanComputed(l){
+  const emi=(l.emiOv&&!isNaN(l.emiOv))?l.emiOv:emiCalc(l.principal,l.rate,l.tenure);
+  const k=(l.kPaid==null||isNaN(l.kPaid))?monthsSince(l.start):l.kPaid;
+  const bal=outstandingAfter(l.principal,l.rate,l.tenure,k,emi);
+  const lockRem=Math.max(0,l.lockMonths-k);
+  return {emi,k,bal,lockRem};
+}
+function buildCfg(){
+  const expTotal=S.expenses.reduce((s,e)=>s+(+e[1]||0),0);
+  const loansC=S.loans.map(l=>{const c=loanComputed(l);return{name:l.name,bal:c.bal,rate:l.rate,emi:c.emi,lockRemaining:c.lockRem,pen:(l.penPct||0)/100};});
+  const emiTotal=loansC.reduce((s,l)=>s+(l.bal>0.005?l.emi:0),0);
+  const outflow=expTotal+emiTotal;
+  const alSum=S.alEq+S.alFx+S.alDb+S.alGl+S.alLq;
+  const blended=(((S.alEq+S.alFx)*S.rEq+(S.alDb+S.alLq)*S.rDb+S.alGl*S.rGl)/(alSum||1))/100;
+  return {cfg:{income:S.income,expenses:expTotal,salGrowth:S.salGrowth/100,efNow:S.efNow,
+    starterTarget:outflow,efTarget:S.efMonths*outflow,efRate:S.rEf/100,minChunk:S.minChunk,
+    sip:S.habitSip?S.habitSipAmt:0,blended,horizonPostFree:60,bonus0:0,loans:loansC},
+    expTotal,emiTotal,outflow,blended,alSum,loansC};
+}
+
+// ================= wizard =================
+let wizStep=0;
+function showWizard(){wizStep=0;$("wizard").classList.add("show");renderWiz();}
+function renderWiz(){
+  const dots=`<div class="wiz-dots">${[0,1,2,3].map(i=>`<div class="${i<=wizStep?"on":""}"></div>`).join("")}</div>`;
+  let body="";
+  if(wizStep===0)body=`${dots}
+    <div class="wiz-title">Let's plan your way out of debt 🎯</div>
+    <div class="wiz-sub">60 seconds of setup. Everything stays in your browser — nothing is uploaded.</div>
+    <div class="card" style="text-align:center">
+      <div class="lblf" style="text-align:center">Monthly take-home income</div>
+      ${stepper("wIncome",S.income,2500,10000,2000000,"big")}
+      <div class="chip-row" style="justify-content:center;margin-top:14px">
+        ${[50000,65000,75000,100000].map(v=>`<button class="chip" onclick="S.income=${v};$('st_wIncome').querySelector('input').value=new Intl.NumberFormat('en-IN').format(${v});store()">${lakh(v)}</button>`).join("")}
+      </div></div>
+    <div class="wiz-nav"><span></span><button class="btn" onclick="wizNext()">Next →</button></div>`;
+  else if(wizStep===1)body=`${dots}
+    <div class="wiz-title">Where does the month go? 🛒</div>
+    <div class="wiz-sub">Rough numbers are fine — tune them anytime later.</div>
+    <div class="card"><div class="exp-grid" id="wExpGrid"></div>
+    <button class="btn ghost" style="width:100%;margin-top:12px" onclick="S.expenses.push(['New category',0,'💳']);renderWiz()">+ add category</button>
+    <div style="text-align:center;margin-top:12px;font-size:14px">Total: <b id="wExpTotal" style="font-size:18px"></b></div></div>
+    <div class="wiz-nav"><button class="btn gray" onclick="wizStep--;renderWiz()">← Back</button><button class="btn" onclick="wizNext()">Next →</button></div>`;
+  else if(wizStep===2)body=`${dots}
+    <div class="wiz-title">Your loans 🏦</div>
+    <div class="wiz-sub">Prefilled from your details — EMI and outstanding are auto-computed. Fine-tune penalties & lock-ins later in the Loans tab.</div>
+    ${S.loans.map((l,i)=>{const c=loanComputed(l);return `<div class="card tight">
+      <div class="loan-head"><b>${esc(l.name)}</b><span class="badge ${l.rate>=13?"hot":"mid"}">${l.rate}% fixed</span></div>
+      <div class="lstats"><div class="lstat"><div class="l">EMI</div><div class="v">${fmt(c.emi)}</div></div>
+      <div class="lstat"><div class="l">Outstanding</div><div class="v">${lakh(c.bal)}</div></div>
+      <div class="lstat"><div class="l">EMIs paid</div><div class="v">${c.k} / ${l.tenure}</div></div>
+      <div class="lstat"><div class="l">Started</div><div class="v">${l.start}</div></div></div></div>`;}).join("")}
+    <div class="wiz-nav"><button class="btn gray" onclick="wizStep--;renderWiz()">← Back</button><button class="btn" onclick="wizNext()">Build my plan ✦</button></div>`;
+  else {
+    const {cfg}=buildCfg(); const R=simulate(cfg); const M=R.metrics;
+    const monthsCut=M.baselineMonths-(M.debtFree??M.baselineMonths);
+    body=`${dots}<div class="wiz-reveal">
+      <div class="mid">If you follow the plan, you'll be</div>
+      <div class="big">DEBT-FREE ${M.debtFree!==null?mLabel(M.debtFree).toUpperCase():"—"}</div>
+      <div class="mid" style="margin-top:14px">That's <b class="good">${monthsCut} months sooner</b> than paying EMIs alone,<br>keeping <b class="good">${lakh(Math.max(0,M.interestSaved))}</b> of interest in your pocket.</div>
+      <div style="margin-top:30px"><button class="btn" style="font-size:15px;padding:13px 26px" onclick="finishWizard()">Open my dashboard →</button></div>
+    </div>`;
+    setTimeout(confetti,350);
+  }
+  $("wizard").innerHTML=`<div class="wiz-inner">${body}</div>`;
+  if(wizStep===0)wireStepper("wIncome",()=>S.income,v=>{S.income=v;store();},2500,10000,2000000,v=>new Intl.NumberFormat("en-IN").format(v));
+  if(wizStep===1)renderWizExpenses();
+}
+function renderWizExpenses(){
+  $("wExpGrid").innerHTML=S.expenses.map((e,i)=>`<div class="exp-card">
+    <button class="x" onclick="S.expenses.splice(${i},1);renderWiz()">✕</button>
+    <div class="ico">${e[2]||"💳"}</div>
+    <input class="nm" value="${esc(e[0])}" onchange="S.expenses[${i}][0]=this.value;S.expenses[${i}][2]=guessIcon(this.value);store()">
+    ${stepper("wx"+i,e[1],500,0,500000,"sm")}</div>`).join("");
+  S.expenses.forEach((e,i)=>wireStepper("wx"+i,()=>S.expenses[i][1],v=>{S.expenses[i][1]=v;store();$("wExpTotal").textContent=fmt(S.expenses.reduce((s,x)=>s+(+x[1]||0),0));},500,0,500000));
+  $("wExpTotal").textContent=fmt(S.expenses.reduce((s,x)=>s+(+x[1]||0),0));
+}
+function wizNext(){wizStep++;renderWiz();}
+function finishWizard(){S.onboarded=true;store();$("wizard").classList.remove("show");bootApp();}
+
+/*TABS*/
+// ================= tabs =================
+const TABS=[["home","🏠 Home"],["money","💵 Money"],["loans","🏦 Loans"],["invest","🌱 Invest"],["market","📈 Market"],["track","🗓️ Track"]];
+let activeTab="home";
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.t===t));
+  document.querySelectorAll(".tabpane").forEach(p=>p.classList.toggle("active",p.id==="tab-"+t));
+  requestAnimationFrame(()=>Object.values(CH).forEach(c=>{try{c&&c.resize();}catch(e){}}));
+  if(t==="market")refreshNAV(false);
+}
+
+function buildTabs(){
+  $("tabbar").innerHTML=TABS.map(([t,l])=>`<button class="tab-btn ${t===activeTab?"active":""}" data-t="${t}" onclick="switchTab('${t}')">${l}</button>`).join("");
+
+  // ---- HOME ----
+  $("tab-home").innerHTML=`
+  <div class="card"><div class="hero">
+    <div class="ring-wrap">
+      <svg width="190" height="190" viewBox="0 0 190 190">
+        <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle class="ring-track" cx="95" cy="95" r="82" fill="none" stroke-width="14"/>
+        <circle class="ring-fill" id="ringFill" cx="95" cy="95" r="82" fill="none" stroke-width="14"
+          stroke-dasharray="515.2" stroke-dashoffset="515.2"/>
+      </svg>
+      <div class="ring-center"><div class="pct" id="ringPct">0%</div><div class="cap">principal cleared</div></div>
+    </div>
+    <div>
+      <h2 style="font-size:19px" id="homeHead">Your road to freedom</h2>
+      <div class="h-sub" id="homeSub"></div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="l">Deployable surplus</div><div class="v" id="hSurplus">—</div><div class="s" id="hSurplusS"></div></div>
+        <div class="hstat"><div class="l">Interest saved</div><div class="v good" id="hSaved">—</div><div class="s" id="hSavedS"></div></div>
+        <div class="hstat"><div class="l">Health score</div><div class="v" id="hScore">—</div><div class="s" id="hScoreS"></div></div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="card">
+    <h2>This month's moves — <span id="movesMonth"></span></h2>
+    <div class="h-sub">Tap each card when done. Money that moves on salary day never gets spent.</div>
+    <div class="moves" id="movesGrid"></div>
+    <div class="sec-note" id="movesNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>What if…? <span style="font-weight:400;font-size:12px;color:var(--dim)">tap to preview — nothing is changed</span></h2>
+    <div class="chip-row" id="whatifChips"></div>
+    <div class="whatif-out" id="whatifOut"></div>
+  </div>
+
+  <div class="card"><h2>Debt payoff — plan vs EMIs-only</h2><div class="h-sub">The gap between the lines is your strategy working.</div>
+    <div class="chartbox"><canvas id="chDebt"></canvas></div></div>`;
+
+  // ---- MONEY ----
+  $("tab-money").innerHTML=`
+  <div class="g g23">
+    <div class="card">
+      <h2>Income</h2><div class="h-sub">Monthly take-home, after tax.</div>
+      <div style="text-align:center">${stepper("income",S.income,2500,10000,2000000,"big")}</div>
+      <div class="lblf">Yearly salary growth (applied every 12 months)</div>
+      ${segmented("salg",[{v:0,t:"0%"},{v:5,t:"5%"},{v:8,t:"8%"},{v:10,t:"10%"},{v:12,t:"12%"}],S.salGrowth)}
+      <div class="lblf">Habit SIP — keep investing a token amount even while repaying</div>
+      <div class="row" style="display:flex;gap:10px;align-items:center">
+        ${segmented("sipon",[{v:"on",t:"On"},{v:"off",t:"Off"}],S.habitSip?"on":"off")}
+        ${stepper("sipamt",S.habitSipAmt,500,0,50000,"sm")}
+        <span style="font-size:12px;color:var(--dim)">/mo → index fund</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Monthly outflow</h2><div class="h-sub">Where the salary goes.</div>
+      <div class="chartbox sm"><canvas id="chExp"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Expenses <span id="expTotalTop" style="float:right;font-size:17px"></span></h2>
+    <div class="h-sub">Tap − / + or type. Hold a button to fast-change.</div>
+    <div class="exp-grid" id="expGrid"></div>
+    <button class="btn ghost" style="margin-top:12px" onclick="addExpense()">+ add category</button>
+  </div>`;
+
+  // ---- LOANS ----
+  $("tab-loans").innerHTML=`
+  <div class="card tight" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <span class="badge acc" style="font-size:11.5px">STRATEGY: AVALANCHE</span>
+    <span style="font-size:13px;color:var(--mut)">Highest interest rate dies first. When a loan clears, its EMI joins the attack on the next one.</span>
+    <span style="margin-left:auto;font-size:13px">Prepay in chunks of ≥</span>${stepper("minChunk",S.minChunk,1000,1000,200000,"sm")}
+  </div>
+  <div id="loanCards"></div>
+  <div class="sec-note">⚠ Both loans are <b>fixed-rate</b>: RBI's Jan 1 2026 ban on prepayment charges covers floating-rate loans to individuals — fixed-rate ones can still carry charges (typically 2–5% + GST) and a 12-EMI lock-in. Check each sanction letter / Key Facts Statement and correct the advanced fields. Even at 4.72%, prepaying beats investing whenever the loan has more than ~5 months left.</div>`;
+
+  // ---- INVEST ----
+  $("tab-invest").innerHTML=`
+  <div class="g g32">
+    <div class="card">
+      <h2>Safety net first 🛡️</h2>
+      <div class="h-sub">The emergency fund is what breaks the debt cycle — the next surprise gets paid in cash, not on credit.</div>
+      <div class="lblf">Target (months of expenses + EMIs)</div>
+      ${segmented("efm",[{v:1,t:"1 mo"},{v:2,t:"2 mo"},{v:3,t:"3 mo"},{v:6,t:"6 mo"}],S.efMonths)}
+      <div class="lblf">Already saved (liquid, untouched)</div>
+      ${stepper("efNow",S.efNow,5000,0,5000000,"")}
+      <div class="pbar" style="margin-top:14px"><div id="efPb" style="width:0%"></div></div>
+      <div class="pbar-cap"><span id="efPbl"></span><span id="efPbr"></span></div>
+      <div class="sec-note">Park it in a <b>sweep-in FD</b> or <b>liquid fund</b> — instant access, ~${S.rEf}% growth. Never in equity.</div>
+    </div>
+    <div class="card">
+      <h2>Risk profile</h2>
+      <div class="h-sub">Sets the post-debt allocation below. You chose Balanced — sensible while carrying loans.</div>
+      ${segmented("preset",[{v:"conservative",t:"Conservative"},{v:"balanced",t:"Balanced"},{v:"aggressive",t:"Aggressive"},{v:"custom",t:"Custom"}],S.preset)}
+      <div class="alloc-bar" id="allocBar"></div>
+      <div style="font-size:12.5px;color:var(--mut)">Blended long-term expectation: <b id="blendedTxt" style="color:var(--ink)"></b> · full surplus deploys here from <b id="deployFrom" class="good"></b></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>The five buckets</h2><div class="h-sub">Percentages of your monthly investable surplus once debt-free (habit SIP uses the index bucket meanwhile). Editing any bucket switches profile to Custom.</div>
+    <div id="buckets"></div>
+    <table style="margin-top:6px"><thead><tr><th>Bucket</th><th class="r">%</th><th class="r">₹/mo at debt-free</th><th class="r">assumed % p.a.</th></tr></thead><tbody id="allocRows"></tbody></table>
+    <div class="sec-note">Instruments: index — UTI/HDFC/ICICI Nifty 50 direct-growth · flexi — Parag Parikh / similar direct-growth · debt — PPF (tax-free, 15-yr) + short-duration funds · gold — ETFs or SGB-secondary · liquid — sweep-in FD / liquid funds. Direct plans only; step up SIPs with every salary hike.</div>
+  </div>
+  <div class="card"><h2>Net worth trajectory</h2><div class="h-sub">Emergency fund + investments − debt, projected 5 years past debt-freedom.</div>
+    <div class="chartbox"><canvas id="chNet"></canvas></div></div>`;
+
+  // ---- MARKET ----
+  $("tab-market").innerHTML=`
+  <div class="card">
+    <h2>Market pulse — India</h2>
+    <div class="h-sub">Tap any tile to edit. Suggestions below re-compute instantly. Prefilled July 9, 2026: repo 5.25% (MPC next: Aug 3–5) · PPF 7.1% · NSC 7.7% (Jul–Sep quarter, unchanged 9 quarters).</div>
+    <div class="tile-grid" id="tileGrid"></div>
+  </div>
+  <div class="card">
+    <h2>Live fund check <button class="btn sm gray" style="float:right" onclick="refreshNAV(true)">↻ refresh</button></h2>
+    <div class="h-sub">Real NAVs & 1-yr returns from mfapi.in (free public data). Works offline too — falls back to your assumptions.</div>
+    <div id="navList"><div class="sec-note">Loading…</div></div>
+    <div style="display:flex;gap:8px;margin-top:10px;max-width:430px">
+      <input class="fld" id="navAdd" placeholder="Add AMFI scheme code, e.g. 122639" inputmode="numeric">
+      <button class="btn sm" onclick="addNavCode()">Add</button>
+    </div>
+    <div class="sec-note">Find scheme codes at mfapi.in — search your fund's name.</div>
+  </div>
+  <div class="card"><h2>Timely suggestions</h2><div class="h-sub">Rule-based on your loans + the rates above — not SEBI-registered advice.</div>
+    <div id="pulseTips"></div></div>`;
+
+  // ---- TRACK ----
+  $("tab-track").innerHTML=`
+  <div class="card">
+    <h2>Log a month <span id="streakWrap" style="float:right"></span></h2>
+    <div class="h-sub">Record what actually moved. Meeting the plan keeps your streak alive.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:130px"><div class="lblf">Month</div><input class="fld" type="month" id="logMonth" value="${curYM()}"></div>
+      <div style="flex:1;min-width:130px"><div class="lblf">Prepaid on loans ₹</div><input class="fld" type="number" id="logPrepaid" placeholder="0" step="500"></div>
+      <div style="flex:1;min-width:130px"><div class="lblf">Saved / invested ₹</div><input class="fld" type="number" id="logInvested" placeholder="0" step="500"></div>
+      <button class="btn" onclick="addLog()">Log it ✓</button>
+    </div>
+    <table style="margin-top:14px"><thead><tr><th>Month</th><th class="r">Prepaid</th><th class="r">Invested</th><th class="r">Plan asked</th><th class="r">Status</th><th></th></tr></thead>
+    <tbody id="logRows"></tbody></table>
+    <div class="sec-note" id="logSummary"></div>
+  </div>
+  <div class="card"><h2>Milestones ahead</h2><div class="h-sub">Auto-updates as you tune the plan.</div><div id="miles"></div></div>
+  <div class="card tight" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:13px;color:var(--mut)">Your data lives only in this browser.</span>
+    <button class="btn sm gray" onclick="exportData()">⬇ Export backup</button>
+    <label class="btn sm gray" style="cursor:pointer">⬆ Import <input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+    <button class="btn sm gray" style="margin-left:auto" onclick="resetAll()">Reset everything</button>
+  </div>`;
+
+  buildExpGrid();buildLoanCards();buildWhatif();buildBuckets();buildTiles();
+
+  // wire money tab controls
+  wireStepper("income",()=>S.income,v=>{S.income=v;},2500,10000,2000000,v=>new Intl.NumberFormat("en-IN").format(v));
+  wireSeg("salg",v=>{S.salGrowth=+v;recalc();});
+  wireSeg("sipon",v=>{S.habitSip=v==="on";recalc();});
+  wireStepper("sipamt",()=>S.habitSipAmt,v=>{S.habitSipAmt=v;},500,0,50000);
+  wireSeg("efm",v=>{S.efMonths=+v;recalc();});
+  wireStepper("efNow",()=>S.efNow,v=>{S.efNow=v;},5000,0,5000000,v=>new Intl.NumberFormat("en-IN").format(v));
+  wireSeg("preset",v=>{applyPreset(v);});
+}
+
+// ----- invest buckets -----
+const PRESETS={conservative:{alEq:10,alFx:0,alDb:55,alGl:15,alLq:20},balanced:{alEq:40,alFx:15,alDb:25,alGl:10,alLq:10},aggressive:{alEq:55,alFx:20,alDb:10,alGl:10,alLq:5}};
+const BUCKETS=[["alEq","Nifty 50 index fund","engine of long-term growth","#34d399","rEq"],
+  ["alFx","Flexi / mid-cap fund","growth kicker, higher swings","#a78bfa","rEq"],
+  ["alDb","Debt — PPF + funds","stability, tax-free PPF core","#60a5fa","rDb"],
+  ["alGl","Gold ETF / SGB","inflation & INR hedge","#fbbf24","rGl"],
+  ["alLq","FD / liquid fund","near-cash buffer top-up","#22d3ee","rDb"]];
+function applyPreset(v){
+  S.preset=v;
+  if(PRESETS[v]){Object.assign(S,PRESETS[v]);buildBuckets();}
+  recalc();
+}
+function buildBuckets(){
+  $("buckets").innerHTML=BUCKETS.map(([k,n,d,c],i)=>`<div class="bucket">
+    <span class="sw" style="background:${c}"></span>
+    <span><span class="bn">${n}</span><br><span class="bd">${d}</span></span>
+    ${stepper("bk"+i,S[k],5,0,100,"sm")}</div>`).join("");
+  BUCKETS.forEach(([k],i)=>wireStepper("bk"+i,()=>S[k],v=>{S[k]=v;S.preset="custom";
+    const sg=$("sg_preset");if(sg){sg.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v==="custom"));}},5,0,100));
+}
+// ----- market tiles -----
+const TILES=[["mRepo","RBI repo %"],["mPpf","PPF %"],["mNsc","NSC %"],["mFd","1-yr FD, major bank %"],["mSfb","Small-finance FD %"],["mLiq","Liquid fund yield %"],["mInf","Inflation CPI %"],["mEqLt","Equity LT expectation %"]];
+function buildTiles(){
+  $("tileGrid").innerHTML=TILES.map(([k,l],i)=>`<div class="tile" id="tile_${k}" onclick="editTile('${k}')">
+    <div class="l">${l}</div><div class="v" id="tv_${k}">${S[k]}%</div></div>`).join("");
+}
+function editTile(k){
+  const v=$("tv_"+k); if(v.querySelector("input"))return;
+  v.innerHTML=`<input value="${S[k]}" inputmode="decimal">`;
+  const inp=v.querySelector("input");inp.focus();inp.select();
+  const done=()=>{const x=parseFloat(inp.value);if(!isNaN(x))S[k]=x;v.textContent=S[k]+"%";recalc();};
+  inp.addEventListener("blur",done);
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")inp.blur();});
+}
+// ================= live NAV =================
+function parseDMY(s){const[a,b,c]=s.split("-");return new Date(+c,+b-1,+a);}
+async function fetchScheme(code){
+  const r=await fetch("https://api.mfapi.in/mf/"+code,{cache:"no-store"});
+  if(!r.ok)throw new Error("http");
+  const j=await r.json(); const d=j.data;
+  if(!d||!d.length)throw new Error("empty");
+  const n0=+d[0].nav, d0=parseDMY(d[0].date);
+  const t1=new Date(d0);t1.setDate(t1.getDate()-365);
+  const t3=new Date(d0);t3.setFullYear(t3.getFullYear()-3);
+  let n1=null,n3=null;
+  for(const e of d){const dt=parseDMY(e.date);
+    if(n1===null&&dt<=t1)n1=+e.nav;
+    if(dt<=t3){n3=+e.nav;break;}}
+  return{code,name:j.meta.scheme_name,nav:n0,date:d[0].date,
+    r1:n1?(n0/n1-1)*100:null,r3:n3?(Math.pow(n0/n3,1/3)-1)*100:null};
+}
+let navBusy=false;
+async function refreshNAV(force){
+  const box=$("navList"); if(!box)return;
+  if(!force&&S.navCache&&Date.now()-S.navCache.ts<86400e3){renderNav(S.navCache.items,true);return;}
+  if(navBusy)return; navBusy=true;
+  if(typeof fetch==="undefined"){renderNav((S.navCache||{}).items||[],false);navBusy=false;return;}
+  box.innerHTML=`<div class="sec-note">Fetching live NAVs…</div>`;
+  try{
+    const rs=await Promise.allSettled(S.navCodes.map(fetchScheme));
+    const items=rs.filter(r=>r.status==="fulfilled").map(r=>r.value);
+    if(items.length){S.navCache={ts:Date.now(),items};store();renderNav(items,true);}
+    else renderNav((S.navCache||{}).items||[],false);
+  }catch(e){renderNav((S.navCache||{}).items||[],false);}
+  navBusy=false;
+}
+function renderNav(items,live){
+  const box=$("navList"); if(!box)return;
+  const rows=(items||[]).map(it=>`<div class="nav-card">
+    <span class="n">${esc(it.name)}<br><span style="color:var(--dim);font-size:11px">code ${it.code} · NAV ₹${it.nav} · ${it.date}</span></span>
+    <span><span class="ret ${it.r1>=0?"good":"bad"}">${it.r1!=null?(it.r1>=0?"+":"")+it.r1.toFixed(1)+"%":"—"}</span><div class="navv">1-yr</div></span>
+    <span style="display:flex;align-items:center;gap:10px"><span><span class="ret">${it.r3!=null?(it.r3>=0?"+":"")+it.r3.toFixed(1)+"%":"—"}</span><div class="navv">3-yr ann.</div></span>
+    <button class="x" style="position:static;border:none;background:none;color:var(--dim);cursor:pointer" onclick="rmNavCode(${it.code})">✕</button></span>
+  </div>`).join("");
+  box.innerHTML=(live?"":`<div class="tip warn2" style="margin-bottom:9px"><b>Offline</b><span class="why">Couldn't reach mfapi.in — showing ${items&&items.length?"last cached values":"nothing yet"}. The plan itself never needs internet.</span></div>`)+
+    (rows||`<div class="sec-note">No funds tracked yet — add a scheme code below.</div>`);
+}
+function addNavCode(){
+  const v=parseInt($("navAdd").value,10);
+  if(!v){toast("Enter a numeric AMFI scheme code");return;}
+  if(!S.navCodes.includes(v))S.navCodes.push(v);
+  $("navAdd").value="";store();S.navCache=null;refreshNAV(true);
+}
+function rmNavCode(c){S.navCodes=S.navCodes.filter(x=>x!==c);if(S.navCache)S.navCache.items=(S.navCache.items||[]).filter(i=>i.code!==c);store();renderNav((S.navCache||{}).items||[],true);}
+
+// ================= updaters =================
+function updateHome(){
+  const {R,cfg,emiTotal,outflow}=LAST, M=R.metrics, f=R.first;
+  const totPrincipal=S.loans.reduce((s,l)=>s+l.principal,0);
+  const totBal=S.loans.reduce((s,l)=>s+loanComputed(l).bal,0);
+  const p=totPrincipal?Math.max(0,Math.min(1,1-totBal/totPrincipal)):0;
+  $("ringFill").style.strokeDashoffset=(515.2*(1-p)).toFixed(1);
+  countUp($("ringPct"),p*100,v=>v.toFixed(1)+"%");
+  $("pillTxt").textContent=M.debtFree!==null?`Debt-free ${mLabel(M.debtFree)} · ${M.debtFree+1} mo to go`:"add surplus to plan";
+  $("homeHead").textContent=M.debtFree!==null?`Freedom lands ${mLabel(M.debtFree)}`:"Let's find you a surplus";
+  $("homeSub").innerHTML=M.debtFree!==null
+    ?`${M.baselineMonths-M.debtFree} months earlier than EMIs alone would manage · owing ${lakh(totBal)} today across ${S.loans.filter(l=>loanComputed(l).bal>0.005).length} loans`
+    :`Expenses + EMIs currently exceed income — trim categories in the Money tab.`;
+  const surplus=S.income-outflow;
+  countUp($("hSurplus"),surplus);
+  $("hSurplus").className="v "+(surplus>0?"good":"bad");
+  $("hSurplusS").textContent=surplus>0?`${(surplus/S.income*100).toFixed(0)}% of income works for you`:"deficit — fix in Money tab";
+  countUp($("hSaved"),Math.max(0,M.interestSaved));
+  $("hSavedS").textContent=`after ${fmt(M.totalPen)} penalties`;
+  const dti=emiTotal/(S.income||1);
+  let score=Math.max(0,Math.min(40,40-(dti-0.2)*133))+Math.max(0,Math.min(30,(S.efNow/(cfg.efTarget||1))*30))+Math.max(0,Math.min(30,(surplus/(S.income||1))/0.2*30));
+  score=Math.round(score);
+  const grade=score>=80?["Strong","good"]:score>=60?["Stable","good"]:score>=40?["Stretched","warn"]:["At risk","bad"];
+  $("hScore").innerHTML=`<span class="${grade[1]}">${score}</span><span style="font-size:12px;color:var(--dim)"> /100 ${grade[0]}</span>`;
+  $("hScoreS").textContent=`EMI load ${(dti*100).toFixed(0)}% · buffer ${Math.min(100,S.efNow/(cfg.efTarget||1)*100).toFixed(0)}% built`;
+  // moves
+  $("movesMonth").textContent=new Date().toLocaleString("en-IN",{month:"long",year:"numeric"});
+  const ym=curYM(); if(!S.checks[ym])S.checks[ym]=[false,false,false];
+  const mv=[];
+  if(f){
+    if(f.sipNow>0)mv.push({ic:"🌱",t:"Habit SIP → index fund",a:f.sipNow,d:"auto-debit on salary day"});
+    if(f.efAdd>0)mv.push({ic:"🛡️",t:"Emergency buffer → sweep-in FD",a:f.efAdd,d:`target ${lakh(cfg.efTarget)} (${S.efMonths} mo of outflow)`});
+    if(f.poolAdd>0)mv.push({ic:f.parked?"🔒":"⚔️",t:f.parked?`Park for attack (lock-in) → liquid fund`:`Attack ${f.prepayTarget||"top loan"} principal`,a:f.poolAdd,d:f.parked?"fires the month prepayment unlocks":"tell the bank: reduce TENURE, not EMI"});
+    if(f.investAdd>0)mv.push({ic:"🚀",t:"Invest the full surplus",a:f.investAdd,d:"per your five buckets"});
+    if(mv.length<3&&f.poolAdd<=0&&!f.deficit&&M.debtFree!==null&&LAST.loansC.some(l=>l.bal>0.005))
+      mv.push({ic:"⚔️",t:"Debt attack queues up",a:0,d:`kicks in once the starter buffer fills — around ${M.starterDone!==null?mLabel(M.starterDone):"soon"}`});
+  }
+  const shown=mv.slice(0,3);
+  $("movesGrid").innerHTML=shown.length?shown.map((m,i)=>`<div class="move ${S.checks[ym][i]?"done":""}" onclick="toggleMove(${i})">
+    <div class="chk">${S.checks[ym][i]?"✓":""}</div>
+    <div class="ic">${m.ic}</div><div class="t">${m.t}</div><div class="amt">${fmt(m.a)}</div><div class="d">${m.d}</div></div>`).join("")
+    :`<div class="move" style="grid-column:1/-1;cursor:default"><div class="ic">⚠️</div><div class="t">No surplus this month</div><div class="d">Expenses + EMIs exceed income — trim categories in the Money tab, the plan can't start negative.</div></div>`;
+  $("movesNote").innerHTML=f&&!f.deficit?`EMIs of <b>${fmt(f.emiOut)}</b> are assumed paid — always first, protects your CIBIL. Check all three moves, then log the month in Track.`:"";
+}
+function toggleMove(i){
+  const ym=curYM(); if(!S.checks[ym])S.checks[ym]=[false,false,false];
+  S.checks[ym][i]=!S.checks[ym][i];store();updateHome();
+  if(S.checks[ym].every(Boolean)){confetti();toast("All moves done — log the month in Track 🗓️");}
+}
+function updateMoney(){
+  $("expTotalTop").textContent=fmt(LAST.expTotal)+" /mo";
+}
+function updateInvest(){
+  const {cfg,blended,alSum}=LAST, M=LAST.R.metrics;
+  const prog=Math.min(100,S.efNow/(cfg.efTarget||1)*100);
+  $("efPb").style.width=prog+"%";
+  $("efPbl").textContent=`${fmt(S.efNow)} saved`;
+  $("efPbr").textContent=`target ${lakh(cfg.efTarget)}`;
+  const sum=alSum||1;
+  $("allocBar").innerHTML=BUCKETS.map(([k,n,,c])=>`<div style="width:${(S[k]/sum*100)}%;background:${c}">${S[k]>=8?S[k]+"%":""}</div>`).join("");
+  $("blendedTxt").textContent=(blended*100).toFixed(1)+"% p.a.";
+  $("deployFrom").textContent=M.debtFree!==null?mLabel(M.debtFree):"—";
+  const monthlyAtFree=M.debtFree!==null?(cfg.income*Math.pow(1+cfg.salGrowth,Math.floor(M.debtFree/12))-cfg.expenses):0;
+  $("allocRows").innerHTML=BUCKETS.map(([k,n,,c,r])=>`<tr><td><span class="sw" style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:8px"></span>${n}</td>
+    <td class="r">${S[k]}%</td><td class="r">${monthlyAtFree>0?fmt(monthlyAtFree*S[k]/sum):"—"}</td><td class="r" style="color:var(--mut)">${S[r]}%</td></tr>`).join("")+
+    (alSum!==100?`<tr><td colspan="4" class="warn" style="font-size:12px">⚠ Buckets sum to ${alSum}% — nudge them to 100%.</td></tr>`:"");
+}
+function updateMarket(){
+  TILES.forEach(([k])=>{const el=$("tv_"+k);if(el&&!el.querySelector("input"))el.textContent=S[k]+"%";});
+  const {loansC}=LAST, tips=[];
+  const alive=loansC.filter(l=>l.bal>0.005).sort((a,b)=>b.rate-a.rate);
+  const hot=alive[0], mo=NOW.getMonth();
+  if(hot){
+    tips.push(["act",`Prepaying ${hot.name} = a guaranteed ${hot.rate}% return`,`Best FD pays ${S.mSfb}%, PPF ${S.mPpf}% — both taxed or locked. Nothing legal guarantees ${hot.rate}%. Every spare rupee's first job is this loan.`]);
+    if(S.mEqLt<=hot.rate+1)tips.push(["warn2",`Equity's hoped-for ${S.mEqLt}% loses to your ${hot.rate}% debt`,`After LTCG tax (12.5% over ₹1.25L/yr) and volatility, the guaranteed prepay wins. Invest big only when your costliest debt is under ~9–10%.`]);
+  }
+  if(LAST.R.first&&LAST.R.first.parked)tips.push(["inf",`Lock-in active — park the attack pool at ~${S.mLiq}%`,`Liquid fund or sweep-in FD while you wait. It fires at the principal the month prepayment unlocks.`]);
+  tips.push(["inf",`Repo ${S.mRepo}% — next MPC Aug 3–5, 2026`,`Your loans are FIXED: a cut won't shrink EMIs (a refinance below ~${(Math.min(...S.loans.map(l=>l.rate))-1.5).toFixed(1)}% floating might — mind processing fees). If cuts come, FD rates fall too: lock the emergency fund's FD rate now, not later.`]);
+  if(mo>=9||mo<=2)tips.push(["act",`Tax window (old regime only)`,`ELSS SIPs count under 80C on the OLD regime. On the new regime skip tax products — employer NPS (80CCD-2) is the break that still works.`]);
+  if([2,5,8,11].includes(mo))tips.push(["inf",`Small-savings rates reset at quarter-end`,`PPF/NSC/SCSS are reviewed quarterly (PPF ${S.mPpf}% — unchanged 9 quarters). NSC keeps its rate once bought; PPF floats.`]);
+  tips.push(["warn2",`FDs barely beat inflation`,`${S.mFd}% FD − ${S.mInf}% CPI ≈ ${(S.mFd-S.mInf).toFixed(1)}% real, pre-tax. Right for the emergency fund, wrong for wealth. That's the buckets' job.`]);
+  tips.push(["warn2",`Credit card: keep the 36–42% trap shut`,`Bill's clear — keep autopay on FULL statement amount. One revolving month at ~3.5%/mo undoes a month of this plan.`]);
+  $("pulseTips").innerHTML=tips.slice(0,7).map(t=>`<div class="tip ${t[0]}"><b>${t[1]}</b><span class="why">${t[2]}</span></div>`).join("");
+}
+function updateTrack(){
+  const planned=LAST.R.series.planned;
+  $("logRows").innerHTML=S.logs.map((e,i)=>{
+    const [y,mo]=e.ym.split("-").map(Number);
+    const idx=(y-NY)*12+(mo-1-NM);
+    const plan=idx>=0&&idx<planned.length?planned[idx]:null;
+    const act=e.prepaid+e.invested;
+    const ok=plan===null?"—":act>=plan*0.9?"<span class='good'>✓ on track</span>":act>=plan*0.5?"<span class='warn'>~ partial</span>":"<span class='bad'>✗ behind</span>";
+    return `<tr><td>${new Date(y,mo-1,1).toLocaleString("en-IN",{month:"short",year:"numeric"})}</td>
+      <td class="r">${fmt(e.prepaid)}</td><td class="r">${fmt(e.invested)}</td>
+      <td class="r" style="color:var(--mut)">${plan===null?"—":fmt(plan)}</td><td class="r">${ok}</td>
+      <td class="r"><button style="border:none;background:none;color:var(--dim);cursor:pointer" onclick="delLog(${i})">✕</button></td></tr>`;
+  }).join("");
+  const tp=S.logs.reduce((s,e)=>s+e.prepaid,0), ti=S.logs.reduce((s,e)=>s+e.invested,0);
+  $("logSummary").textContent=S.logs.length?`Lifetime: ${fmt(tp)} prepaid + ${fmt(ti)} invested over ${S.logs.length} month(s). Every ₹10,000 prepaid at 14.25% keeps ~₹119/month in your pocket, permanently.`:"Nothing logged yet — first entry after next salary day.";
+  // streak
+  let streak=0;
+  const sorted=[...S.logs].sort((a,b)=>a.ym.localeCompare(b.ym));
+  for(let i=sorted.length-1;i>=0;i--){
+    const e=sorted[i];const [y,mo]=e.ym.split("-").map(Number);
+    const idx=(y-NY)*12+(mo-1-NM);
+    const plan=idx>=0&&idx<planned.length?planned[idx]:null;
+    if(plan!==null&&e.prepaid+e.invested>=plan*0.9)streak++;else break;
+  }
+  $("streakWrap").innerHTML=streak>0?`<span class="streak">🔥 ${streak}-month streak</span>`:"";
+  // milestones
+  const M=LAST.R.metrics,cfg=LAST.cfg,out=[];
+  const add=(idx,what)=>out.push({idx,what});
+  if(M.starterDone!==null)add(M.starterDone,`Starter buffer ${lakh(cfg.starterTarget)} done — one bad month can't push you back to borrowing`);
+  S.loans.forEach(l=>{const c=loanComputed(l);
+    if(c.lockRem>0&&c.bal>0)add(c.lockRem,`${esc(l.name.split(" ")[0])} prepayment window opens`);});
+  const dk=Object.entries(M.deaths).sort((a,b)=>a[1]-b[1]);
+  dk.forEach(([nm,mm],i)=>add(mm,i===dk.length-1?`🏁 ${esc(nm)} cleared — DEBT FREE. ${fmt(LAST.emiTotal)}/mo of EMIs becomes yours`:`${esc(nm)} cleared — its EMI joins the next attack`));
+  if(M.efDone!==null)add(M.efDone,`Full ${S.efMonths}-month emergency fund (${lakh(cfg.efTarget)})`);
+  if(M.debtFree!==null){
+    const inv=LAST.R.series.inv;
+    [[100000,"₹1 lakh"],[500000,"₹5 lakh"],[1000000,"₹10 lakh"]].forEach(([v,lb])=>{
+      const idx=inv.findIndex(x=>x>=v);
+      if(idx>=0)add(idx,`Investment corpus crosses ${lb}`);});
+    add(M.debtFree+60,`Projected net worth ${lakh(M.netEnd)} — five years after freedom`);
+  }
+  out.sort((a,b)=>a.idx-b.idx);
+  $("miles").innerHTML=out.map((m,i)=>`<div class="mile"><div class="dot ${i>2?"f":""}"></div>
+    <div class="when">${mLabel(m.idx)}</div><div class="what">${m.what}</div></div>`).join("")||"<div class='sec-note'>Add surplus to see milestones.</div>";
+}
+function addLog(){
+  const ym=$("logMonth").value; if(!ym){toast("Pick a month");return;}
+  const e={ym,prepaid:parseFloat($("logPrepaid").value)||0,invested:parseFloat($("logInvested").value)||0};
+  const i=S.logs.findIndex(x=>x.ym===ym); if(i>=0)S.logs[i]=e; else S.logs.push(e);
+  S.logs.sort((a,b)=>a.ym.localeCompare(b.ym));
+  $("logPrepaid").value="";$("logInvested").value="";
+  store();updateTrack();
+  const planned=LAST.R.series.planned;
+  const [y,mo]=ym.split("-").map(Number);const idx=(y-NY)*12+(mo-1-NM);
+  const plan=idx>=0&&idx<planned.length?planned[idx]:null;
+  if(plan!==null&&e.prepaid+e.invested>=plan*0.9){confetti();toast("On track — the plan is working 🔥");}
+  else toast("Logged ✓");
+}
+function delLog(i){S.logs.splice(i,1);store();updateTrack();}
+function exportData(){
+  const a=document.createElement("a");
+  a.href="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(S,null,1));
+  a.download="debt-freedom-backup.json";a.click();
+}
+function importData(inp){
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{S=Object.assign(JSON.parse(JSON.stringify(DEFAULTS)),JSON.parse(r.result));store();buildTabs();destroyCharts();mkCharts();recalc();toast("Backup restored ✓");}catch(e){toast("Couldn't read that file");}};
+  r.readAsText(f);
+}
+function resetAll(){if(confirm("Reset everything to defaults? Your logs will be lost.")){try{localStorage.removeItem("dfp-v2");localStorage.removeItem("dfp-v1");}catch(e){}location.reload();}}
+
+// ----- money helpers -----
+function buildExpGrid(){
+  $("expGrid").innerHTML=S.expenses.map((e,i)=>`<div class="exp-card">
+    <button class="x" onclick="delExpense(${i})">✕</button>
+    <div class="ico">${e[2]||"💳"}</div>
+    <input class="nm" value="${esc(e[0])}" onchange="S.expenses[${i}][0]=this.value;S.expenses[${i}][2]=guessIcon(this.value);recalc()">
+    ${stepper("ex"+i,e[1],500,0,500000,"sm")}</div>`).join("");
+  S.expenses.forEach((e,i)=>wireStepper("ex"+i,()=>S.expenses[i][1],v=>{S.expenses[i][1]=v;},500,0,500000));
+}
+function addExpense(){S.expenses.push(["New category",0,"💳"]);buildExpGrid();recalc();}
+function delExpense(i){S.expenses.splice(i,1);buildExpGrid();recalc();}
+
+// ----- loans -----
+function buildLoanCards(){
+  $("loanCards").innerHTML=S.loans.map((l,i)=>{
+    return `<div class="loan-card" id="lc_${i}">
+    <div class="loan-head">
+      <input class="lname" value="${esc(l.name)}" onchange="S.loans[${i}].name=this.value;recalc()">
+      <span class="badge ${l.rate>=13?"hot":"mid"}" id="ln_rate_${i}">${l.rate}% fixed</span>
+      <span class="badge acc" id="ln_order_${i}"></span>
+      <span style="margin-left:auto;font-weight:800;font-size:17px" id="ln_bal_${i}">—</span>
+    </div>
+    <div class="pbar"><div id="ln_pb_${i}" style="width:0%"></div></div>
+    <div class="pbar-cap"><span id="ln_pbl_${i}"></span><span id="ln_pbr_${i}"></span></div>
+    <div class="lstats">
+      <div class="lstat"><div class="l">EMI / month</div><div class="v" id="ln_emi_${i}">—</div></div>
+      <div class="lstat"><div class="l">Cleared on plan</div><div class="v good" id="ln_dead_${i}">—</div></div>
+      <div class="lstat"><div class="l">Interest left (EMIs-only)</div><div class="v" id="ln_int_${i}">—</div></div>
+      <div class="lstat"><div class="l">Prepay unlocks</div><div class="v" id="ln_lock_${i}">—</div></div>
+    </div>
+    <details class="adv"><summary>Advanced — verify against your sanction letter</summary>
+      <div class="adv-grid">
+        <div><div class="lblf">Rate % p.a.</div>${stepper("lr"+i,l.rate,0.05,1,36,"sm")}</div>
+        <div><div class="lblf">EMIs paid</div>${stepper("lk"+i,loanComputed(l).k,1,0,360,"sm")}</div>
+        <div><div class="lblf">Penalty % (incl GST)</div>${stepper("lp"+i,l.penPct,0.25,0,10,"sm")}</div>
+        <div><div class="lblf">Lock-in (months)</div>${stepper("ll"+i,l.lockMonths,1,0,36,"sm")}</div>
+        <div><div class="lblf">Principal ₹</div>${stepper("lP"+i,l.principal,10000,10000,20000000,"sm")}</div>
+        <div><div class="lblf">Tenure (months)</div>${stepper("lt"+i,l.tenure,6,6,360,"sm")}</div>
+        <div><div class="lblf">Actual EMI ₹ (bank's)</div>${stepper("le"+i,Math.round(loanComputed(l).emi),100,0,500000,"sm")}</div>
+      </div>
+    </details></div>`;}).join("");
+  S.loans.forEach((l,i)=>{
+    wireStepper("lr"+i,()=>S.loans[i].rate,v=>{S.loans[i].rate=v;},0.05,1,36);
+    wireStepper("lk"+i,()=>loanComputed(S.loans[i]).k,v=>{S.loans[i].kPaid=v;},1,0,360);
+    wireStepper("lp"+i,()=>S.loans[i].penPct,v=>{S.loans[i].penPct=v;},0.25,0,10);
+    wireStepper("ll"+i,()=>S.loans[i].lockMonths,v=>{S.loans[i].lockMonths=v;},1,0,36);
+    wireStepper("lP"+i,()=>S.loans[i].principal,v=>{S.loans[i].principal=v;},10000,10000,20000000);
+    wireStepper("lt"+i,()=>S.loans[i].tenure,v=>{S.loans[i].tenure=v;},6,6,360);
+    wireStepper("le"+i,()=>Math.round(loanComputed(S.loans[i]).emi),v=>{S.loans[i].emiOv=v||null;},100,0,500000);
+  });
+  wireStepper("minChunk",()=>S.minChunk,v=>{S.minChunk=v;},1000,1000,200000);
+}
+function updateLoans(){
+  if(!LAST)return;
+  const order=[...S.loans].map((l,i)=>({i,rate:l.rate})).sort((a,b)=>b.rate-a.rate);
+  S.loans.forEach((l,i)=>{
+    const c=loanComputed(l);
+    const paidPct=Math.max(0,Math.min(100,(1-c.bal/l.principal)*100));
+    countUp($("ln_bal_"+i),c.bal,lakh);
+    $("ln_rate_"+i).textContent=l.rate+"% fixed";
+    $("ln_rate_"+i).className="badge "+(l.rate>=13?"hot":"mid");
+    const pos=order.findIndex(o=>o.i===i);
+    $("ln_order_"+i).textContent=c.bal<=0.005?"CLEARED 🎉":(pos===0?"⚔ ATTACK #1":"attack #"+(pos+1));
+    $("ln_pb_"+i).style.width=paidPct+"%";
+    $("ln_pbl_"+i).textContent=paidPct.toFixed(1)+"% of principal cleared";
+    $("ln_pbr_"+i).textContent=`${c.k} of ${l.tenure} EMIs done`;
+    $("ln_emi_"+i).textContent=fmt(c.emi);
+    const death=LAST.R.metrics.deaths[l.name];
+    $("ln_dead_"+i).textContent=death!==undefined?mLabel(death):"—";
+    // remaining interest if EMIs only
+    const remN=Math.max(0,l.tenure-c.k);
+    $("ln_int_"+i).textContent=fmt(Math.max(0,c.emi*remN-c.bal));
+    $("ln_lock_"+i).textContent=c.lockRem>0?mLabel(c.lockRem):"open now ✓";
+    $("ln_lock_"+i).className="v "+(c.lockRem>0?"warn":"good");
+  });
+}
+
+// ----- what-if -----
+const WHATIFS=[
+  {t:"+₹1,000/mo",f:c=>{c.income+=1000;}},
+  {t:"+₹2,500/mo",f:c=>{c.income+=2500;}},
+  {t:"+₹5,000/mo",f:c=>{c.income+=5000;}},
+  {t:"₹25k bonus now",f:c=>{c.bonus0=25000;}},
+  {t:"₹50k bonus now",f:c=>{c.bonus0=50000;}},
+  {t:"Cut expenses ₹2k",f:c=>{c.expenses-=2000;}}
+];
+let wiActive=-1;
+function buildWhatif(){
+  $("whatifChips").innerHTML=WHATIFS.map((w,i)=>`<button class="chip" id="wi_${i}" onclick="toggleWhatif(${i})">${w.t}</button>`).join("");
+}
+function toggleWhatif(i){
+  wiActive=wiActive===i?-1:i;
+  WHATIFS.forEach((w,j)=>$("wi_"+j).classList.toggle("on",j===wiActive));
+  const out=$("whatifOut");
+  if(wiActive<0){out.classList.remove("show");return;}
+  const base=LAST.R.metrics;
+  const cfg2=JSON.parse(JSON.stringify(LAST.cfg));WHATIFS[wiActive].f(cfg2);
+  const alt=simulate(cfg2).metrics;
+  const dm=(base.debtFree??base.baselineMonths)-(alt.debtFree??alt.baselineMonths);
+  const di=alt.interestSaved-base.interestSaved;
+  out.innerHTML=`<b>${WHATIFS[wiActive].t}:</b> debt-free <b class="good">${dm>0?dm+" month"+(dm>1?"s":"")+" sooner":dm<0?Math.abs(dm)+" months later":"same month"}</b>
+    (${alt.debtFree!==null?mLabel(alt.debtFree):"—"}) · extra interest kept: <b class="good">${fmt(Math.max(0,di))}</b>
+    · net worth after 5 debt-free yrs: <b>${lakh(alt.netEnd)}</b> vs ${lakh(base.netEnd)}`;
+  out.classList.add("show");
+}
+
+// ================= charts =================
+let CH={};
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function destroyCharts(){Object.values(CH).forEach(c=>{try{c&&c.destroy();}catch(e){}});CH={};}
+function mkCharts(){
+  if(typeof Chart==="undefined"){document.querySelectorAll(".chartbox").forEach(b=>b.innerHTML=`<div style="color:var(--dim);padding:28px;font-size:13px">Charts need one-time internet access to load the chart library — every number in the app works without them.</div>`);return;}
+  const mut=cssVar("--mut"),line=cssVar("--line"),acc=cssVar("--acc"),red=cssVar("--red"),blue=cssVar("--blue"),violet=cssVar("--violet");
+  Chart.defaults.color=mut;Chart.defaults.borderColor=line;Chart.defaults.font.size=11;
+  Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+  const money=v=>lakh(v);
+  CH.debt=new Chart($("chDebt"),{type:"line",data:{labels:[],datasets:[
+    {label:"Your plan",data:[],borderColor:acc,backgroundColor:acc+"26",fill:true,tension:.35,pointRadius:0,borderWidth:2.5},
+    {label:"EMIs only",data:[],borderColor:red,borderDash:[6,4],fill:false,tension:.35,pointRadius:0,borderWidth:2}]},
+    options:{maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+      plugins:{legend:{labels:{boxWidth:12,usePointStyle:true,pointStyle:"line"}},tooltip:{callbacks:{label:c=>c.dataset.label+": "+money(c.parsed.y)}}},
+      scales:{y:{ticks:{callback:money}},x:{ticks:{maxTicksLimit:8}}}}});
+  CH.net=new Chart($("chNet"),{type:"line",data:{labels:[],datasets:[
+    {label:"Net worth",data:[],borderColor:acc,backgroundColor:acc+"1f",fill:true,tension:.35,pointRadius:0,borderWidth:2.5},
+    {label:"Investments",data:[],borderColor:violet,fill:false,tension:.35,pointRadius:0,borderWidth:1.6},
+    {label:"Emergency fund",data:[],borderColor:blue,fill:false,tension:.35,pointRadius:0,borderWidth:1.6}]},
+    options:{maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+      plugins:{legend:{labels:{boxWidth:12,usePointStyle:true,pointStyle:"line"}},tooltip:{callbacks:{label:c=>c.dataset.label+": "+money(c.parsed.y)}}},
+      scales:{y:{ticks:{callback:money}},x:{ticks:{maxTicksLimit:8}}}}});
+  CH.exp=new Chart($("chExp"),{type:"doughnut",data:{labels:[],datasets:[{data:[],borderWidth:2,borderColor:cssVar("--card2")||"#111",
+    backgroundColor:["#fb7185","#fb923c","#fbbf24","#a3e635","#34d399","#22d3ee","#60a5fa","#a78bfa","#f472b6","#94a3b8","#e879f9","#fca5a5"]}]},
+    options:{maintainAspectRatio:false,cutout:"62%",plugins:{legend:{position:"right",labels:{boxWidth:10,font:{size:10.5}}},
+      tooltip:{callbacks:{label:c=>c.label+": "+fmt(c.parsed)}}}}});
+}
+function updateCharts(){
+  if(!CH.debt||!LAST)return;
+  const {R,loansC}=LAST, M=R.metrics;
+  const n=Math.min(R.series.debt.length,Math.max((M.debtFree==null?0:M.debtFree)+61,M.baselineMonths+1,24));
+  const labels=Array.from({length:n},(_,i)=>mLabel(i));
+  CH.debt.data.labels=labels;
+  CH.debt.data.datasets[0].data=R.series.debt.slice(0,n);
+  CH.debt.data.datasets[1].data=R.bSeries.slice(0,n);
+  CH.debt.update("none");
+  CH.net.data.labels=labels;
+  CH.net.data.datasets[0].data=R.series.net.slice(0,n);
+  CH.net.data.datasets[1].data=R.series.inv.slice(0,n);
+  CH.net.data.datasets[2].data=R.series.ef.slice(0,n);
+  CH.net.update("none");
+  const surplus=S.income-LAST.outflow;
+  const lbls=S.expenses.map(e=>(e[2]||"")+" "+e[0]).concat(loansC.filter(l=>l.bal>0.005).map(l=>"🏦 "+l.name+" EMI"),surplus>0?["🌱 Plan surplus"]:[]);
+  const data=S.expenses.map(e=>+e[1]||0).concat(loansC.filter(l=>l.bal>0.005).map(l=>l.emi),surplus>0?[surplus]:[]);
+  CH.exp.data.labels=lbls;CH.exp.data.datasets[0].data=data;CH.exp.update("none");
+}
+
+// ================= recalc & boot =================
+let BOOTED=false, LAST=null;
+function recalc(){
+  if(!BOOTED){store();return;}
+  const b=buildCfg();
+  LAST={R:simulate(b.cfg),cfg:b.cfg,expTotal:b.expTotal,emiTotal:b.emiTotal,outflow:b.outflow,blended:b.blended,alSum:b.alSum,loansC:b.loansC};
+  updateHome();updateMoney();updateLoans();updateInvest();updateMarket();updateTrack();updateCharts();
+  if(wiActive>=0){const k=wiActive;wiActive=-1;toggleWhatif(k);}
+  store();
+}
+function applyTheme(t){
+  S.theme=t;document.documentElement.dataset.theme=t;
+  $("themeBtn").textContent=t==="dark"?"☀️":"🌙";
+  if(BOOTED){destroyCharts();mkCharts();updateCharts();}
+  store();
+}
+function bootApp(){
+  $("app").style.display="block";
+  buildTabs();
+  destroyCharts();mkCharts();
+  BOOTED=true;
+  recalc();
+  switchTab("home");
+  setTimeout(()=>refreshNAV(false),800);
+}
+window.addEventListener("DOMContentLoaded",()=>{
+  document.documentElement.dataset.theme=S.theme;
+  $("themeBtn").textContent=S.theme==="dark"?"☀️":"🌙";
+  $("themeBtn").addEventListener("click",()=>applyTheme(S.theme==="dark"?"light":"dark"));
+  if(S.onboarded)bootApp();else showWizard();
+});
+</script>
+</body>
+</html>
